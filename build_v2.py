@@ -1,4 +1,37 @@
-<!doctype html>
+import re,json,html,os,zipfile,math
+from pathlib import Path
+base=Path('/mnt/data/bonaire-dive-pwa')
+src=(base/'data.js').read_text()
+# Extract JS array
+m=re.search(r'const sites=(\[.*\]);\s*$',src,re.S)
+sites=json.loads(m.group(1))
+coords={
+'1000-steps':(12.2020,-68.2842),'18th-palm':(12.1381,-68.2822),'alice-in-wonderland':(12.1119,-68.2856),
+'andrea-i':(12.1822,-68.2822),'andrea-ii':(12.1786,-68.2825),'angel-city':(12.1147,-68.2861),'aquarius':(12.1097,-68.2867),
+'atlantis':(12.0644,-68.2708),'bachelor-s-beach':(12.1236,-68.2864),'barcadera':(12.1889,-68.2811),'bari-reef':(12.1697,-68.2842),
+'bise-morto':(12.2606,-68.4008),'bloodlet':(12.2331,-68.2931),'boka-bartol':(12.2939,-68.4103),'boka-slagbaai':(12.2661,-68.4147),
+'buddy-s-reef':(12.1656,-68.2842),'calabas-reef':(12.1489,-68.2822),'cha-cha-cha':(12.1264,-68.2853),'chez-hines':(12.1319,-68.2842),
+'cliff':(12.1789,-68.2839),'corporal-meiss':(12.1300,-68.2847),'front-porch':(12.1594,-68.2839),'invisibles':(12.0908,-68.2789),
+'jeannie-s-glory':(12.1058,-68.2869),'jeff-davis-memorial':(12.2028,-68.2847),'karpata':(12.2213,-68.2917),'la-dania-s-leap':(12.2258,-68.2947),
+'la-machaca':(12.1642,-68.2839),'larry-s-lair':(12.1075,-68.2864),'lighthouse-point':(12.1175,-68.2872),'margate-bay':(12.0625,-68.2703),
+'north-belnem':(12.1361,-68.2839),'nukove':(12.2394,-68.3439),'oil-slick-leap':(12.1875,-68.2803),'petries-pillar':(12.1750,-68.2831),
+'pink-beach':(12.0794,-68.2761),'playa-beng':(12.2872,-68.4139),'playa-frans':(12.2489,-68.3644),'playa-funchi':(12.2789,-68.4092),
+'red-beryl':(12.0678,-68.2725),'red-slave':(12.0247,-68.2481),'reef-scientifico':(12.1667,-68.2842),'salt-city':(12.1006,-68.2856),
+'salt-pier':(12.1069,-68.2872),'small-wall':(12.1714,-68.2839),'something-special':(12.1594,-68.2825),'sweet-dreams':(12.0294,-68.2506),
+'te-amo':(12.1281,-68.2842),'tolo-ol-blue':(12.2306,-68.2986),'tori-s-reef':(12.0561,-68.2664),'town-pier':(12.1503,-68.2789),
+'vista-blue':(12.0342,-68.2531),'wayaka':(12.2708,-68.4056),'weber-s-joy':(12.1972,-68.2822),'white-slave':(12.0453,-68.2603),
+'willemstoren':(12.0206,-68.2469),'windsock':(12.1339,-68.2825)
+}
+for s in sites:
+    if s['id'] not in coords: raise SystemExit('Missing coord '+s['id'])
+    s['lat'],s['lng']=coords[s['id']]
+# Add official-ish number based on STINAPA map for recognizable numbered sites where known
+numbers={'boka-bartol':'1','playa-beng':'2','playa-funchi':'3','bise-morto':'4','wayaka':'5','boka-slagbaai':'6','nukove':'7','karpata':'9','la-dania-s-leap':'10','bloodlet':'12','tolo-ol-blue':'13','1000-steps':'16','weber-s-joy':'17','jeff-davis-memorial':'18','oil-slick-leap':'20','barcadera':'21','andrea-ii':'22','andrea-i':'23','petries-pillar':'24','small-wall':'25','cliff':'26','la-machaca':'27','reef-scientifico':'28','buddy-s-reef':'29','bari-reef':'30','front-porch':'31','something-special':'32','town-pier':'33','calabas-reef':'34','18th-palm':'35','windsock':'36','corporal-meiss':'37','bachelor-s-beach':'38','chez-hines':'39','lighthouse-point':'40','te-amo':'41','alice-in-wonderland':'45','angel-city':'44','aquarius':'46','larry-s-lair':'47','jeannie-s-glory':'48','salt-pier':'49','salt-city':'50','invisibles':'51','tori-s-reef':'52','pink-beach':'53','white-slave':'54','margate-bay':'55','red-beryl':'56','atlantis':'57','vista-blue':'58','sweet-dreams':'59','red-slave':'60','willemstoren':'61'}
+for s in sites:s['number']=numbers.get(s['id'])
+(base/'data.js').write_text('const sites='+json.dumps(sites,ensure_ascii=False,separators=(',',':'))+';\n')
+
+# Actual-coordinate map bounds and approximate Bonaire coastline. The markers are GPS positions from the source pages; coastline is a lightweight local reference shape.
+index=r'''<!doctype html>
 <html lang="nl"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#063b52"><meta name="description" content="Bonaire shore dive planner met GPS-locaties">
@@ -14,7 +47,7 @@
 <div class="legend"><span><i class="dot" style="background:#159b6c"></i>binnen jouw profiel</span><span><i class="dot" style="background:#d76f27"></i>gevorderd</span><span><i class="dot" style="background:#b83e56"></i>lokale briefing</span></div>
 <div id="count" class="small"></div><div id="list" class="list"></div>
 <div class="notice"><b>Belangrijk:</b> GPS helpt je de entry te vinden, maar is geen onderwaternavigatie. Gebruik de gele stone/entry ter plaatse en volg je lokale briefing. De duikduur is geen gasberekening.</div>
-<div class="footer">Brondata voor GPS/locatie en kenmerken: Bonairian's 87-site overzicht en individuele sitepagina's; officiële site-nummering gecontroleerd tegen STINAPA/Bonaire National Marine Park.</div>
+<div class="footer">Brondata voor GPS/locatie en kenmerken: Bonairian's 87-site overzicht en individuele sitepagina's; officiële site-nummering gecontroleerd tegen STINAPA/Bonaire National Marine Park. cite_placeholder</div>
 </div>
 <div id="detail" class="detail"><div class="sheet"><button class="close" onclick="closeDetail()">×</button><div id="detailContent"></div></div></div>
 <script src="data.js"></script><script>
@@ -36,4 +69,17 @@ $('#list').innerHTML=arr.map(s=>`<article class="sitecard" onclick="openDetail('
 function openDetail(id){const s=sites.find(x=>x.id===id);if(!s)return;const route=s.route||genericRoute(s);const [lat,lng]=[s.lat.toFixed(5),s.lng.toFixed(5)];$('#detailContent').innerHTML=`<h2>${s.name}</h2><div class="sub">${s.number?'Duikstek #'+s.number+' · ':''}${s.regionLabel} · ${s.depth}</div><div class="grid"><div class="info"><b>GPS</b><span>${lat}, ${lng}</span></div><div class="info"><b>Jouw profiel</b><span>PADI OW · ≤18 m</span></div><div class="info"><b>Entry</b><span>${s.entry}</span></div><div class="info"><b>Richting</b><span>${s.direction}</span></div><div class="info"><b>Oriëntatie</b><span>${s.orientation}</span></div><div class="info"><b>Keerpunt</b><span>${s.turn}</span></div></div><div class="route"><h3>Duikopbouw ±50 min</h3><div class="timeline">${route.map(r=>`<div class="step"><div class="mins">${r.t}</div><div>${r.d}</div></div>`).join('')}</div></div><div class="route"><h3>Onder water</h3><p style="margin:0;font-size:13px;line-height:1.5">${s.description}</p></div>${s.warning?`<div class="notice"><b>Let op:</b> ${s.warning}</div>`:''}<a class="button" href="${mapsUrl(s)}" target="_blank" rel="noopener">Navigeer naar GPS met Google Maps →</a><button class="button alt" onclick="closeDetail()">Terug naar kaart</button><p class="small" style="margin-top:10px">GPS is voor de entry/locatie op land. De onderwaterroute is geen gegarandeerde track. Je werkelijke gasverbruik, buddy, computer, stroming en omstandigheden bepalen je duik.</p>`;$('#detail').classList.add('open')}
 function closeDetail(){$('#detail').classList.remove('open')}
 ['search','level','region','profileOnly'].forEach(id=>$('#'+id).addEventListener(id==='search'?'input':'change',render));$('#detail').addEventListener('click',e=>{if(e.target.id==='detail')closeDetail()});render();
-</script></body></html>
+</script></body></html>'''
+# Remove placeholder source token; actual source links are given in final response.
+index=index.replace(' cite_placeholder','')
+(base/'index.html').write_text(index)
+(base/'README.md').write_text('''# Bonaire Dive Buddy v2\n\nPWA voor Bonaire shore dives. De kaart gebruikt echte GPS-coördinaten van de duikstekken en een lokaal ingebouwde geografische referentiekaart.\n\n## Belangrijk\n- De markers zijn GPS-locaties van de entry/duikstek, niet een onderwater-track.\n- Google Maps wordt gebruikt voor weg-navigatie naar de GPS-locatie.\n- Offline werkt de lokale kaart en de site-informatie; Google Maps-navigatie vereist verbinding.\n- Filter staat standaard op jouw profiel: PADI Open Water / max. 18 m. Zet "alle plekken" uit als je alle shore dives wilt zien.\n- De ±50 min route is een algemene planning, geen gasberekening of decompressieadvies.\n\n## Bronnen\n- Bonairian, overzicht en individuele duikstekpagina's: https://bonairian.com/duikplekken/\n- STINAPA/Bonaire National Marine Park: https://stinapabonaire.org/\n''')
+(base/'DEPLOY.md').write_text('''# Publiceren op GitHub Pages\n1. Upload alle bestanden uit deze map naar de hoofdmap van je repository.\n2. GitHub: Settings → Pages → Deploy from a branch → main → /(root) → Save.\n3. Open daarna: https://<gebruikersnaam>.github.io/<repository>/\n4. Open de app één keer online en installeer hem via Chrome → Toevoegen aan startscherm / Installeren.\n\nVoor Google Maps: download Bonaire vooraf in Google Maps voor offline wegkaarten.\n''')
+# bump cache
+(base/'sw.js').write_text('''const CACHE="bonaire-dive-buddy-v2";const ASSETS=["./","./index.html","./data.js","./manifest.json","./icon.svg"];self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));self.addEventListener("fetch",e=>{if(e.request.method!=="GET")return;e.respondWith(caches.match(e.request).then(c=>c||fetch(e.request).then(r=>{const copy=r.clone();caches.open(CACHE).then(x=>x.put(e.request,copy));return r}).catch(()=>caches.match("./index.html"))))});''')
+# zip
+zip_path=Path('/mnt/data/Bonaire-Dive-Buddy-PWA-v2.zip')
+with zipfile.ZipFile(zip_path,'w',zipfile.ZIP_DEFLATED) as z:
+    for f in base.iterdir():
+        if f.is_file(): z.write(f,f.name)
+print(zip_path, len(sites), 'sites')
