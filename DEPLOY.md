@@ -1,3 +1,5 @@
+Version 6.0 — location audit 3 October 2026
+
 # GitHub Pages
 Upload alle bestanden naar de root van je repository en kies Settings → Pages → Deploy from a branch → main → /(root).
 
