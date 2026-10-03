@@ -1,14 +1,12 @@
-# Bonaire Dive Buddy v2
+# Bonaire Dive Buddy v3
 
-PWA voor Bonaire shore dives. De kaart gebruikt echte GPS-coördinaten van de duikstekken en een lokaal ingebouwde geografische referentiekaart.
+Interactieve Leaflet/OpenStreetMap-kaart met GPS-markers voor shore dives.
 
-## Belangrijk
-- De markers zijn GPS-locaties van de entry/duikstek, niet een onderwater-track.
-- Google Maps wordt gebruikt voor weg-navigatie naar de GPS-locatie.
-- Offline werkt de lokale kaart en de site-informatie; Google Maps-navigatie vereist verbinding.
-- Filter staat standaard op jouw profiel: PADI Open Water / max. 18 m. Zet "alle plekken" uit als je alle shore dives wilt zien.
-- De ±50 min route is een algemene planning, geen gasberekening of decompressieadvies.
+- Markers zijn echt aanklikbaar.
+- Kaartitems openen dezelfde marker en detailpagina.
+- Google Maps gebruikt directe GPS-coördinaten.
+- De kaart kan lokaal worden gecachet met **Kaart offline opslaan** terwijl je online bent.
+- Download Bonaire ook vooraf in Google Maps voor offline weg-navigatie.
+- Standaard filter: PADI Open Water / max. 18 m.
 
-## Bronnen
-- Bonairian, overzicht en individuele duikstekpagina's: https://bonairian.com/duikplekken/
-- STINAPA/Bonaire National Marine Park: https://stinapabonaire.org/
+Bronnen/controle: STINAPA, PADI, Bonaire.com, Bonairian en OpenStreetMap.

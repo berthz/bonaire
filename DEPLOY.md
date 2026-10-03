@@ -1,7 +1,6 @@
-# Publiceren op GitHub Pages
-1. Upload alle bestanden uit deze map naar de hoofdmap van je repository.
-2. GitHub: Settings → Pages → Deploy from a branch → main → /(root) → Save.
-3. Open daarna: https://<gebruikersnaam>.github.io/<repository>/
-4. Open de app één keer online en installeer hem via Chrome → Toevoegen aan startscherm / Installeren.
+# GitHub Pages
+Upload alle bestanden naar de root van je repository en kies Settings → Pages → Deploy from a branch → main → /(root).
 
-Voor Google Maps: download Bonaire vooraf in Google Maps voor offline wegkaarten.
+Na publicatie: open de site één keer online, druk in de app op **Kaart offline opslaan**, en download Bonaire in Google Maps voor offline autoroutes.
+
+Als je een oude versie ziet: sluit de geïnstalleerde PWA volledig, open de GitHub Pages URL opnieuw in Chrome en ververs één keer. De service-worker-cache heet v3.
