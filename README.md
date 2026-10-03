@@ -12,3 +12,7 @@ Interactieve Leaflet/OpenStreetMap-kaart met GPS-markers voor shore dives.
 - Standaard filter: PADI Open Water / max. 18 m.
 
 Bronnen/controle: STINAPA, PADI, Bonaire.com, Bonairian en OpenStreetMap.
+
+
+## v8.0
+STINAPA-genummerde hoofd-Bonaire-sites 1–63, inclusief Cai; filters voor toegang toegevoegd; niet-genummerde extra spots verwijderd.
