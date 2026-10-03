@@ -1,4 +1,4 @@
-# Bonaire Dive Buddy v4
+# Bonaire Dive Buddy v5
 
 Interactieve Leaflet/OpenStreetMap-kaart met GPS-markers voor shore dives.
 
